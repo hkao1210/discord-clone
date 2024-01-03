@@ -8,6 +8,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog"
 import { ServerWithMembersWithProfiles } from "@/types";
+import { MemberRole } from "@prisma/client";
 
 import { useModal } from "@/hooks/use-modal-store";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -26,7 +27,6 @@ import {
 	DropdownMenuSubTrigger
 } from "@/components/ui/dropdown-menu"
 import { Check, Gavel, Loader2, MoreVertical, Shield, ShieldQuestion } from "lucide-react";
-import { MemberRole } from "@prisma/client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 const roleIconMap = {
@@ -41,6 +41,25 @@ export const MembersModal = () => {
 	const isModalOpen = isOpen && type === "members";
 	const { server } = data as { server: ServerWithMembersWithProfiles };
 
+	const onKick = async (memberId: string) => {
+		try{
+			setLoadingId(memberId);
+			const url = qs.stringifyUrl({
+				url: `/api/members/${memberId}`,
+				query: {
+					serverId: server?.id,
+				},
+			});
+			const response = await axios.delete(url);
+			router.refresh();
+			onOpen("members", { server: response.data });
+		}catch(error){
+			console.log(error);
+		}finally{
+			setLoadingId("");
+		}
+	}
+	
 	const onRoleChange = async (memberId: string, role: MemberRole) => {
 		try {
 			setLoadingId(memberId);
@@ -48,7 +67,6 @@ export const MembersModal = () => {
 				url: `/api/members/${memberId}`,
 				query: {
 					serverId: server?.id,
-					memberId,
 				}
 			});
 
@@ -56,7 +74,7 @@ export const MembersModal = () => {
 			router.refresh();
 			onOpen("members", { server: response.data });
 
-		} catch (error) {
+			} catch (error) {
 			console.log(error);
 		} finally {
 			setLoadingId("");
@@ -75,7 +93,7 @@ export const MembersModal = () => {
 				</DialogHeader>
 				<ScrollArea className="mt-8 max-h-[420px] pr-6">
 					{server?.members?.map((member) => (
-						<div key={member.id} className="flex items-center gap-x-2 mb-5">
+						<div key={member.id} className="flex items-center gap-x-2 mb-6">
 							<UserAvatar src={member.profile.imageUrl} />
 							<div className="flex flex-col gap-y-1">
 								<div className="text-xs font-semibold flex items-center gap-x-1">
@@ -128,7 +146,7 @@ export const MembersModal = () => {
 												</DropdownMenuPortal>
 											</DropdownMenuSub>
 											<DropdownMenuSeparator />
-											<DropdownMenuItem>
+											<DropdownMenuItem onClick = {()=> onKick(member.id)}>
 												<Gavel className="h-4 w-4 mr-2" />
 												Kick
 											</DropdownMenuItem>

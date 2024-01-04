@@ -1,56 +1,37 @@
-import { currentProfile } from "@/lib/current-profile";
-import { db } from "@/lib/db";
+import { v4 as uuidv4 } from "uuid";
 import { NextResponse } from "next/server";
 
-export async function DELETE(
+import { currentProfile } from "@/lib/current-profile";
+import { db } from "@/lib/db";
+
+export async function PATCH(
     req: Request,
-    { params }: { params: { memberId: string } }
+    { params }: { params: { serverId: string } }
 ) {
     try {
         const profile = await currentProfile();
-        const { searchParams } = new URL(req.url);
-        const serverId = searchParams.get("serverId");
 
         if (!profile) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
-        if (!serverId) {
+
+        if (!params.serverId) {
             return new NextResponse("Server ID Missing", { status: 400 });
         }
-        if (!params.memberId) {
-            return new NextResponse("Member ID Missing", { status: 400 });
-        }
+
         const server = await db.server.update({
             where: {
-                id: serverId,
+                id: params.serverId,
                 profileId: profile.id,
             },
             data: {
-                members: {
-                    deleteMany: {
-                        id: params.memberId,
-                        profileId: {
-                            not: profile.id,
-                        }
-                    }
-                }
-            }, 
-            include:{
-                members:{
-                    include:{
-                        profile:true,
-                    },
-                    orderBy:{
-                        role:"asc",
-                    }
-                },
+                inviteCode: uuidv4(),
             },
         });
 
         return NextResponse.json(server);
-
     } catch (error) {
-        console.log("[MEMBER_ID_DELETE]", error);
+        console.log("[SERVER_ID]", error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

@@ -33,6 +33,7 @@ import {
 	SelectTrigger,
 	SelectValue
 } from "@/components/ui/select"
+import { useEffect } from "react";
 
 const formSchema = z.object({
 	name: z.string().min(1, {
@@ -47,20 +48,26 @@ const formSchema = z.object({
 });
 
 export const CreateChannelModal = () => {
-	const { isOpen, onClose, type } = useModal();
+	const { isOpen, onClose, type, data } = useModal();
 	const router = useRouter();
 	const params = useParams();
 	const isModalOpen = isOpen && type === "createChannel";
-
+	const {channelType} = data;
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: "",
-			type: ChannelType.TEXT,
-
+			type: channelType || ChannelType.TEXT,
 		}
 	});
 
+	useEffect(() => {
+		if (channelType) {
+			form.setValue("type", channelType);
+		}else{
+			form.setValue("type", ChannelType.TEXT);
+		}
+	 }, [channelType, form]);
 	const isLoading = form.formState.isSubmitting;
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -68,11 +75,11 @@ export const CreateChannelModal = () => {
 			//stringifyUrl is being used to construct a URL with query parameters from an object.
 			const url = qs.stringifyUrl({
 				url: "/api/channels",
-				query:{
+				query: {
 					serverId: params?.serverId
 				}
 			});
-			
+
 			await axios.post(url, values);
 
 			form.reset();

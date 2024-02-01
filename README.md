@@ -1,3 +1,7 @@
+Project based on Code with Antonio tutorial, but with Nextjs 14. Will test new deployments/improvements once completed.
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started

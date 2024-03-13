@@ -1,4 +1,9 @@
-"use client";//This just means it's a client-side component, not a react-server component. Both are rendered on server-side.
+"use client";
+//This just means it's a client-side component, not a react-server component. Both are rendered on server-side.
+//So yes, the component should be rendered on the client side, but initally it's still rendered on the server-side. Server sends a statci HTML preview of the component to the client, then the client takes over and makes the component fully interactive. This process is known as HYDRATION.
+
+//Hydration is the process of attaching event listeners to the DOM, to make the static HTML interactive. Behind the scenes, hydration is done with the hydrateRoot
+//function from react-dom. It's called on the client side, and it takes the static HTML and makes it interactive.
 import { DeleteChannelModal } from "@/components/modals/delete-channel-modal";
 import { useEffect, useState } from "react";
 import { InviteModal } from "@/components/modals/invite-modal";

@@ -2,17 +2,17 @@ import { currentProfilePages } from "@/lib/current-profile-pages";
 import { NextApiResponseServerIo } from "@/types";
 import { NextApiRequest } from "next";
 import { db } from "@/lib/db";
-import { ServerSearch } from "@/components/server/server-search";
 import { MemberRole } from "@prisma/client";
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponseServerIo,
+    res: NextApiResponseServerIo, 
 ) {
     if (req.method !== "DELETE" && req.method !== "PATCH") {
         return res.status(405).json({ message: "Method not allowed" });
     }
     try {
+        console.log("This is the query:", req.query)
         const profile = await currentProfilePages(req);
         const { messageId, serverId, channelId } = req.query;
         const { content } = req.body;
@@ -20,7 +20,7 @@ export default async function handler(
             return res.status(401).json({ message: "Unauthorized" });
         }
         if (!serverId) {
-            return res.status(400).json({ message: "Server ID is required" });
+            return res.status(400).json({ message: "Server ID is required." });
         }
         if (!channelId) {
             return res.status(400).json({ message: "Channel ID is required" });
@@ -118,6 +118,7 @@ export default async function handler(
                 }
             })
         }
+        //[messageId].ts is for updating and deleting
         const updateKey = `chat:${channelId}:messages:update`;
 
         res?.socket?.server?.io?.emit(updateKey, message);

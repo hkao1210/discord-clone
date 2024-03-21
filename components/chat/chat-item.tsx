@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useRouter, useParams } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -57,8 +58,16 @@ export const ChatItem = ({
   socketQuery,
 }: ChatItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const {onOpen} = useModal();
+  const { onOpen } = useModal();
+  const params = useParams();
+  const router = useRouter();
 
+  const onMemberClick = () => {
+    if (member.id === currentMember.id) {
+      return;
+    }
+    router.push(`/servers/${params?.serverId}/conversations/${member.id}`)
+  }
   useEffect(() => {
     const handleKeyDown = (event: any) => {
       if (event.key === "Escape" || event.keyCode === 27) {
@@ -112,7 +121,7 @@ export const ChatItem = ({
   return (
     <div className="relative group flex items-center hover:bg-black/5 p-4 transition w-full">
       <div className="group flex gap-x-2 items-start w-full">
-        <div className="cursor-pointer hover:drop-shadow-md transition">
+        <div onClick={onMemberClick} className="cursor-pointer hover:drop-shadow-md transition">
           <UserAvatar src={member.profile.imageUrl} />
         </div>
         <div className="flex flex-col w-full">
@@ -173,9 +182,9 @@ export const ChatItem = ({
                     <FormItem className="flex-1">
                       <FormControl>
                         <div className="relative w-full">
-                          <Input 
-                          disabled = {isLoading}
-                          className="p-2 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-600 dark:text-zinc-200"
+                          <Input
+                            disabled={isLoading}
+                            className="p-2 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-600 dark:text-zinc-200"
                             placeholder="Edited message"
                             {...field}
                           />
@@ -184,7 +193,7 @@ export const ChatItem = ({
                     </FormItem>
                   )}
                 />
-                <Button disabled = {isLoading} size="sm" variant="primary">
+                <Button disabled={isLoading} size="sm" variant="primary">
                   Save
                 </Button>
               </form>
@@ -205,8 +214,12 @@ export const ChatItem = ({
             </ActionTooltip>
           )}
           <ActionTooltip label="Delete">
-            <Trash  
-            onClick = {() => onOpen("deleteMessage", {apiUrl: `${socketUrl}/${id}`})}className="cursor-pointer ml-auto w-4 h-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition " />
+            <Trash
+              onClick={() => onOpen("deleteMessage", {
+                apiUrl: `${socketUrl}/${id}`,
+                query: socketQuery,
+              })}
+              className="cursor-pointer ml-auto w-4 h-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition " />
           </ActionTooltip>
         </div>
       )}

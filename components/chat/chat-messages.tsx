@@ -2,11 +2,12 @@
 
 import { Member, Message, Profile } from "@prisma/client";
 import { ChatWelcome } from "./chat-welcome";
-import { useChatQuery } from "@/hooks/use-chat-query";
 import { Loader2, ServerCrash } from "lucide-react";
 import { Fragment } from "react";
 import { ChatItem } from "./chat-item";
 import { format } from "date-fns";
+
+import { useChatQuery } from "@/hooks/use-chat-query";
 import { useChatSocket } from "@/hooks/use-chat-socket";
 
 const DATE_FORMAT = "d MMM yyyy, HH:mm";
@@ -49,7 +50,7 @@ export const ChatMessages = ({
         isFetchingNextPage,
         status,
     } = useChatQuery({
-        queryKey: `chat-${chatId}`,
+        queryKey,
         apiUrl,
         paramKey,
         paramValue,

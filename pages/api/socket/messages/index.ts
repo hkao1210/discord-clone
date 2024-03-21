@@ -69,7 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
             }
         });
         //index is for adding messages
-        const channelKey = `chat:${channelId}: messages`;
+        const channelKey = `chat:${channelId}:messages`;
 
         res?.socket?.server?.io?.emit(channelKey, message);
 

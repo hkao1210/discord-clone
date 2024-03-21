@@ -26,7 +26,7 @@ export const useChatQuery = ({
                 [paramKey]: paramValue,
             }
         }, { skipNull: true });
-
+        console.log('Fetching chat messages from:', url); // Log the API URL
         const res = await fetch(url);
         return res.json();
     };

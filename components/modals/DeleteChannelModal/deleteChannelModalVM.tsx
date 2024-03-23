@@ -4,18 +4,14 @@ import {useModal} from "@/hooks/use-modal-store";
 import qs from "query-string";
 import axios from "axios";
 
-interface Image {
-    id: string;
-    base64Code: string;
-}
+
 
 interface UseImagePortalVMReturn {
     onClick: () => void;
     onClose: () => void;
     isModalOpen: boolean;
     isLoading: boolean;
-    channel: Image | null;
-}
+    channel: any;}
 
 const useDeleteChannelModalVM = (): UseImagePortalVMReturn => {
 
